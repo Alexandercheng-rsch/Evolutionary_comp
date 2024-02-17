@@ -19,18 +19,12 @@ acceleration = "cuda";
 store = [];
 n = 5
 for i = 1:n
-    i
     tic
     [b,c] = main_random_local_search("ga",tabs,@GA_perm,file,acceleration);
     toc
     combo_cat_with_dist_1 = cat(2,b,c);
     store = [store;combo_cat_with_dist_1];
 end
-
-%%
-
-
-%%
 
 %%
 [mean_elements,std_elements, clusters] = cluster_calculator(store);
@@ -45,29 +39,47 @@ clusters{27}
 candidates = [];
 
 for i = 1:length(mean_elements)
-    if mean_elements(i)<12400 && std_elements(i)<900
+    if mean_elements(i)<13400 && std_elements(i)<100
         candidates(end + 1) = i;
     end
 end
 candidates
+%%
 
 %%
-crossover_prob = 1;
+[a,b] = sort(all);
+asd = candidates(b)
+asd(1:5)
+%%
+clusters{1699}
+%%
+crossover_prob = 0.88;
 pop_size = 20;
 iterations = 10000/pop_size;
-mutation_prob = 0.2;
-selection_method = 2;
-k = 8;
-mutation_type = 1;
-elitism_factor = 0.03;
+mutation_prob = 0.17;
+selection_method = 1;
+k = 5;
+mutation_type = 2;
+elitism_factor = 0.078;
 plots = false;
 store = [];
 for i = 1:30
     [~,b] = GA_perm(file,crossover_prob,pop_size,iterations,mutation_prob,selection_method,k,mutation_type,elitism_factor,plots);
-    store(end + 1) = b;
+    store(end + 1) = b
 end
 calculate_mean = mean(store);
 calculate_std = std(store);
+%%
+
+
+
+
+
+
+
+
+
+
 
 %%
 %%inputcities,inital_temp,constant_decrement,k_max,num_neighbours,alpha,cooling_schedule,show_graph
@@ -75,13 +87,13 @@ addpath('Simulated_annealing');
 %%
 inital_t = 90;
 constant_decrement = 1.9;
-k_max = 500000;
+k_max = 10000;
 num_neighbours = 5
 cooling_technique = 3;
 alpha = 0.95;
-show_graph = false;
+show_graph = true;
 cooling_schedule = 1;
-%[x_best,best_dist] = simulated_annealing(file,inital_t,constant_decrement,k_max,num_neighbours,alpha,cooling_technique,cooling_schedule,show_graph)
+[x_best,best_dist] = simulated_annealing(file,inital_t,constant_decrement,k_max,num_neighbours,alpha,cooling_technique,cooling_schedule,show_graph)
 
 %%cooling methods: 1 - exponential 2- Linear 3 - Boltzman
 %%

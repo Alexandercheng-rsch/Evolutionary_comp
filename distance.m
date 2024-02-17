@@ -1,16 +1,11 @@
-function d = distance(input_cities)
-d = zeros(1,size(input_cities,3))
-z = 0
-for j = 1:size(input_cities,3)
-    for i = 2:length(input_cities)
-        if i==length(input_cities) %trip back to original city
+function d = distance(inputcities)
 
-            z = z + ceil(sqrt(sum((input_cities(:,i,j) - input_cities(:,1,j)).^2)/10)); %Divide 10 for normalisation
-        else
-          
-         z = z + ceil(sqrt(sum((input_cities(:,i,j) - input_cities(:,i+1,j)).^2)/10)); %Divide 10 for normalisation
-         
-      end
+d = 0;
+for n = 1 : length(inputcities)
+    if n == length(inputcities)
+        d = d + ceil(sqrt(sum((inputcities(:,n) - inputcities(:,1)).^2)/10));
+    else    
+        d = d + ceil(sqrt(sum((inputcities(:,n) - inputcities(:,n+1)).^2)/10));
     end
-    d(j) = z
 end
+

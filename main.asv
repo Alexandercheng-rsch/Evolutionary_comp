@@ -1,154 +1,75 @@
+%Importing the coordinates for TSP
 addpath('Genetic_Algorithm');
 file = "att48.tsp";
-file = tsp_read(file,48);
+file = tsp_read(file,48); 
 %%
-%%
-crossover_prob = [0.7:0.04:1]';
-max_population = [8;10;12;14;16;18;16];
-max_iterations = [100;100;100;100;100;100;100;100];
-mutation_prob = [0.05:0.020:0.2]';
-selection_method = [1;2;1;1;1;1;1;1];
-k = [5;6;7;8;9;10;11;12];
-mutation_type = [1;2;3;1;1;1;1;1];
-elitism_factor = [0.03:0.01:0.1]'
+%%Defining the search space for local random search
+crossover_prob = [0.7:0.06:1]';
+max_population = [9;10;13;15;17;20];
+max_iterations = [100;100;100;100;100;100];
+mutation_prob = [0.05:0.03:0.2]';
+selection_method = [1;2;1;1;1;1;];
+k = [3;4;5;6;7;8];
+mutation_type = [1;2;3;1;1;1];
+elitism_factor = [0.03:0.012:0.1]'
 tabs = table(crossover_prob,max_population,max_iterations,mutation_prob,selection_method,k,mutation_type,elitism_factor);
-acceleration = "cpu";
+acceleration = "cuda";
+
 %%
 store = [];
-n = 10
+n = 5
 for i = 1:n
-    i
+    tic
     [b,c] = main_random_local_search("ga",tabs,@GA_perm,file,acceleration);
+    toc
     combo_cat_with_dist_1 = cat(2,b,c);
     store = [store;combo_cat_with_dist_1];
 end
 
 %%
-catted = [store;store2;store3;store4;store5;store6;store7];
-
-%%
-full_catted = [catted;catted2];
-%%
-[mean_elements,std_elements, clusters] = cluster_calculator(full_catted);
+[mean_elements,std_elements, clusters] = cluster_calculator(store);
 
 mean_elements = cell2mat(mean_elements);
 std_elements = cell2mat(std_elements);
 %%
+clusters{27}
   
 %% We want low distance and low std, which implies robustness and high performing.
 
 candidates = [];
 
 for i = 1:length(mean_elements)
-    if mean_elements(i)<30000 && std_elements(i)<920
+    if mean_elements(i)<13500 && std_elements(i)<100
         candidates(end + 1) = i;
     end
 end
 candidates
+%%
 
 %%
-crossover_prob = 0.9;
+[a,b] = sort(all);
+asd = candidates(b)
+asd(1:5)
+%%
+clusters{27}
+%%
+crossover_prob = 1;
 pop_size = 20;
-iterations = 500;
-mutation_prob = 0.1;
-selection_method = 2
-k = 6;
-mutation_type = 3
-elitism_factor = 0.1
-plots = false
-[a,b] = GA_perm(file,crossover_prob,pop_size,iterations,mutation_prob,selection_method,k,mutation_type,elitism_factor,plots);
-
-%%
-crossover_prob = 0.9
-pop_size = 20
-iterations = round(10000/pop_size)
-mutation_prob = 0.09
-selection_method = 1
-k = 1
-mutation_type = 3
-plots = false
-asd = []
+iterations = 10000/pop_size;
+mutation_prob = 0.2;
+selection_method = 2;
+k = 7;
+mutation_type = 2;
+elitism_factor = 0.03;
+plots = false;
+store = [];
 for i = 1:30
-    [a,b] = GA_perm(file,crossover_prob,pop_size,iterations,mutation_prob,selection_method,k,mutation_type,plots)
-    asd(end + 1) = b
+    [~,b] = GA_perm(file,crossover_prob,pop_size,iterations,mutation_prob,selection_method,k,mutation_type,elitism_factor,plots);
+    store(end + 1) = b
 end
-
-
-
-
-
-
+calculate_mean = mean(store);
+calculate_std = std(store);
 %%
-
-crossover_prob = [0.7:0.04:1]';
-max_population = [12:19]';
-max_iterations = [100;100;100;100;100;100;100;100];
-mutation_prob = [0.05:0.020:0.2]';
-selection_method = [2;2;2;2;2;2;2;2];
-k = [1;1;1;1;1;1;1;1];
-mutation_type = [1;2;3;1;1;1;1;1];
-tabs = table(crossover_prob,max_population,max_iterations,mutation_prob,selection_method,k,mutation_type);
-acceleration = "cuda";
-n = 30;
-store = zeros(n,8);
-
-n = 10;
-for i = 1:n
-    i
-    [b,c] = main_random_local_search("ga",tabs,@GA_perm,file,acceleration);
-    combo_cat_with_dist = cat(2,b,c);
-    if i==2
-        concated_list_1 = cat(1,combo_cat_with_dist,combo_cat_with_dist);
-    elseif i>2
-        concated_list_1 = cat(1,concated_list_1,combo_cat_with_dist);
-    end
-end
-
-%%
-cat_1_and_2 = cat(1,concated_list_1,concated_list_2);
-
-%%
-
-[mean_elements,std_elements, clusters] = cluster_calculator(cat_1_and_2);
-
-mean_elements = cell2mat(mean_elements);
-std_elements = cell2mat(std_elements);
-[sorted_std,idx_std] = sort(std_elements,'ascend');
-[sorted_mean,idx_mean] = sort(mean_elements,'ascend');
-
-%%
-
-%% We want low distance and low std, which implies robustness and high performing.
-threshold = 1;
-candidates = [];
-termination_flag = false
-for i = 1:size(sorted_mean,1)
-    for j = i+1:size(sorted_std,1)-1
-        if idx_std(i)==idx_mean(j)  && termination_flag==false
-            candidates(1 + end) = idx_mean(j);
-        elseif j > 3000
-            termination_flag = true;
-        end
-    end
-    if termination_flag
-        break
-    end
-end
-%%
-clusters{1542}
-%%
-
-%%
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -166,13 +87,13 @@ addpath('Simulated_annealing');
 %%
 inital_t = 90;
 constant_decrement = 1.9;
-k_max = 500000;
+k_max = 10000;
 num_neighbours = 5
 cooling_technique = 3;
 alpha = 0.95;
-show_graph = false;
+show_graph = true;
 cooling_schedule = 1;
-%[x_best,best_dist] = simulated_annealing(file,inital_t,constant_decrement,k_max,num_neighbours,alpha,cooling_technique,cooling_schedule,show_graph)
+[x_best,best_dist] = simulated_annealing(file,inital_t,constant_decrement,k_max,num_neighbours,alpha,cooling_technique,cooling_schedule,show_graph)
 
 %%cooling methods: 1 - exponential 2- Linear 3 - Boltzman
 %%

@@ -48,9 +48,9 @@ function [best_tour, best_distance] = GA_perm(inputcities, crossover_prob, max_p
             p_mutate = rand();
             if p_mutate <= mutation_prob
                 if mutation_type == 1
-                    offspring = swap(offspring);
+                    offspring = RSM(offspring);
                     parents_concat = [parents(i,:);parents(i+1,:)];
-                    only_mutated = swap(parents_concat);
+                    only_mutated = RSM(parents_concat);
                 elseif mutation_type == 2
                     offspring = inversion_mutation(offspring);
                     parents_concat = [parents(i,:);parents(i+1,:)];

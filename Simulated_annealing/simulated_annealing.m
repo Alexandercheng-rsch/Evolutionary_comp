@@ -16,21 +16,20 @@ temp = inital_temp;
 
 k = 1; %initiate counter
 
-maintain_heat = 0;
+maintain_heat = 0; %Setting the counter for how long each temperature is held for
 while k < k_max 
 
-    algorithm = "sa";
     p = rand(1);
+    %%Looking for neighbours, different probabilities results in a
+    %%different type of searching technique
     if p<= 0.3
-        ga = 0
-        x_new = twoopt(x_current,0,ga);
+        x_new = twoopt(x_current);
         e_new = idx2dist(x_new,inputcities);
     elseif p>0.3 && p<0.6
-        x_new = swap(x_current,0);
+        x_new = swap(x_current);
         e_new = idx2dist(x_new,inputcities);
     elseif p >= 0.6
-        ga = 0 
-        x_new = twoopt(swap(x_current,0),0,ga);
+        x_new = twoopt(swap(x_current));
         e_new = idx2dist(x_new,inputcities);
     end
     
