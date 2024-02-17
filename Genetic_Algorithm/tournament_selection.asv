@@ -1,0 +1,35 @@
+function winners = tournament_selection(pop, k, max_pop, inputcities)
+n = size(pop,2)
+winners = zeros(max_pop,n)
+best = randperm(size(pop,2),1)
+best = pop(idx(2),:)
+for j = 1:max_pop
+    for i = 2:k
+        idx = randperm(n,2)
+        participant_1 = pop(best,:)
+        participant_2 = pop(idx(2),:)
+        if idx2dist(best,:) > idx2dist(participant_2,:)
+            best = pop(participant_2,:)
+        end
+    end
+    winners(j,:) = pop
+end
+
+
+
+
+
+
+
+
+
+
+
+
+
+function [dist] = idx2dist(index,inputcities)
+dist = [];
+for i = 1:size(index,1)
+    dist(end + 1) = distance(inputcities(:,index(i,:)));
+end
+end
