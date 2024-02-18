@@ -1,4 +1,4 @@
-function [hyperparam, best_dist] = accelerated_local_search_sa(parameters,sa,file,acceleration,iteration)
+function [hyperparam, best_dist,best_std] = accelerated_local_search_sa(parameters,sa,file,acceleration,iteration)
 
 %%If it's empty, these are the default values
 if nargin <5 || isempty(iteration)
@@ -21,21 +21,26 @@ end
 if acceleration=="cpu" %%transfer to cpu
   
     termination_flag = false;
-    store = [];
     idx = 0;
     
     combination = table2array(combinations(table2array(parameters(:,1)),table2array(parameters(:,2)), ...
-        table2array(parameters(:,3)),table2array(parameters(:,4)),table2array(parameters(:,5)),table2array(parameters(:,6))));
+        table2array(parameters(:,3)),table2array(parameters(:,4))));
     [combination, ~, ~] = unique(combination,"rows","stable");
-    stop = size(combination,1);
-    
+    stop = size(combination,1)
+    all_dist = zeros(1, stop);
+    all_std = zeros(1, stop);
     hyperparam = zeros(stop, width(parameters));
     while termination_flag==false
         idx = idx + 1;
         show = false;
-        [~,best_distance] = sa(file,combination(idx,1),combination(idx,2),combination(idx,3),combination(idx,4),combination(idx,5),combination(idx,6),show);
-        
-        store(end + 1) = best_distance;
+        storage = zeros(1, 5);
+        for i = 1:10
+            [~, best_distance] = sa(file,combination(idx,1),combination(idx,2),combination(idx,3),combination(idx,4),show)
+            storage(i) = best_distance;
+        end
+        all_dist(idx) = mean(storage);
+        hyperparam(idx,:) = combination(idx,:);
+        all_std(idx,:) = std(storage);
         if idx==stop || idx==iteration
             termination_flag = true;
         end
@@ -43,8 +48,9 @@ if acceleration=="cpu" %%transfer to cpu
     [~,sorted_idx] = sort(store,"ascend");
     %output of the best performing hyperparameters and routes with distance
     hyperparam = combination(sorted_idx,:);
-    best_dist = store(sorted_idx);
+    best_dist = all_dist(sorted_idx);
     best_dist = best_dist';
+    best_std = all_std(sorted_idx)'
 end
 
 
@@ -60,7 +66,7 @@ if acceleration=="multi" && license('test', 'Distrib_Computing_Toolbox')%%transf
     
     %%turning table into array
     combination = table2array(combinations(table2array(parameters(:,1)),table2array(parameters(:,2)),table2array(parameters(:,3)), ...
-        table2array(parameters(:,4)),table2array(parameters(:,5)),table2array(parameters(:,6))));
+        table2array(parameters(:,4))));
   
     [combination, ~, ~] = unique(combination,"rows","stable");
   
@@ -71,6 +77,7 @@ if acceleration=="multi" && license('test', 'Distrib_Computing_Toolbox')%%transf
     %Storing variables
     stop = size(combination,1)
     all_dist = zeros(1, stop);
+    all_std = zeros(1, stop);
     hyperparam = zeros(stop, width(parameters));
     %
     
@@ -91,10 +98,16 @@ if acceleration=="multi" && license('test', 'Distrib_Computing_Toolbox')%%transf
     show = false;
 
     parfor idx = 1:stop
-        [~, best_distance] = sa(file,combination(idx,1),combination(idx,2),combination(idx,3),combination(idx,4),combination(idx,5),combination(idx,6),show)
-        all_dist(idx) = best_distance;
+        storage = zeros(1, 5);
+        for i = 1:10
+            [~, best_distance] = sa(file,combination(idx,1),combination(idx,2),combination(idx,3),combination(idx,4),show)
+            storage(i) = best_distance;
+        end
+
+        all_dist(idx) = mean(storage);
         hyperparam(idx,:) = combination(idx,:);
-        
+        all_std(idx,:) = std(storage);  
+        disp(idx)
     end
     %
     [~,sorted_idx] = sort(all_dist,"ascend");
@@ -102,6 +115,7 @@ if acceleration=="multi" && license('test', 'Distrib_Computing_Toolbox')%%transf
     hyperparam = combination(sorted_idx,:);
     best_dist = all_dist(sorted_idx);
     best_dist = best_dist';
+    best_std = all_std(sorted_idx)'
     %
     
 

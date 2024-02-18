@@ -22,7 +22,7 @@ if mode == 0
     end
 elseif mode == 1
     %%grouping combinations
-    [~,~,grouped_indicies] = unique(concated_list(:,1:6),'rows','stable'); % unique rows, with grouping index
+    [~,~,grouped_indicies] = unique(concated_list(:,1:5),'rows','stable'); % unique rows, with grouping index
     groupedrows = cell(max(grouped_indicies),1);
     for i = 1:max(grouped_indicies)
         groupedrows{i} = concated_list(grouped_indicies == i, :);

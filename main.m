@@ -88,22 +88,14 @@ addpath('Simulated_annealing');
 
 %%
 repmat(100,10)
-inital_temp = linspace(1,12, 20)';
-k_max = repmat(100,1,20)';
-alpha = linspace(0.8, 0.99, 20)';
+temp_max = linspace(100,10000, 2 0)';
+alpha = linspace(0.8, 0.99, 20)';adasdsadsad
 cooling_technique = repmat([1 2],1,10)';
-cooling_schedule = round(linspace(0, 20, 20))';
-acceptance_prob = linspace(0.8,0.99,20)';
-%(inputcities,inital_temp,k_max,alpha,cooling_method,cooling_schedule,acceptance_prob,show_graph)
-params = table(inital_temp,k_max,alpha,cooling_technique,cooling_schedule,acceptance_prob);
+cooling_schedule = round(linspace(100, 700, 20))';
+%temp_max, alpha, cooling_method, cooling_schedule,max_iterations, show_graph)
+params = table(temp_max ,alpha, cooling_technique, cooling_schedule);
 acceleration = "multi";
-store = []
-for i = 1:5
-    [hyperparam, dist] = main_random_local_search("sa",params,@simulated_annealing,file,acceleration);
-    combo_cat_with_dist_1 = cat(2,hyperparam,dist);
-    store = [store;combo_cat_with_dist_1];
-end
-save('asdasda.mat', 'store');
+[hyperparam, dist, std] = main_random_local_search("sa",params,@simulated_annealing,file,acceleration);
 %%
 mode = 1;
 [mean_elements,std_elements, clusters] = cluster_calculator(store,mode);
@@ -116,39 +108,31 @@ std_elements = cell2mat(std_elements);
 candidates = [];
 
 for i = 1:length(mean_elements)
-    if mean_elements(i)<27100 && std_elements(i)<3000
+    if mean_elements(i)<30000 & std_elements(i)<1000
         candidates(end + 1) = i;
     end
 end
 candidates
 %%
-clusters{111}
+a = clusters{292}
 %%
-inital_t = 1;
-k_max = 10000;
+t_max = 1000
+0;
+alpha = 0.99;
 cooling_technique = 1;
-alpha = 0.963636363636364 ;
-show_graph = false;
-cooling_schedule = 8.42105263157895;
-acceptance_prob = 0.726363636363636
-store_sa = []
+cooling_schedule = 1000;
+max_iterations = 100000;
+store_sa = [];
+show_graph = false
+[a,best_dist] = simulated_annealing(file,t_max,alpha,cooling_technique,cooling_schedule,show_graph)
+%plotcities(file(:,a))
+%%
 for i = 1:30
     [~,best_dist] = simulated_annealing(file,inital_t,k_max,alpha,cooling_technique,cooling_schedule,acceptance_prob,show_graph);
     store_sa(end + 1) = best_dist
 end
 calculate_mean = mean(store_sa);
 calculate_std = std(store_sa);
-%%
-inital_t = 1;
-k_max = 10000;
-cooling_technique = 2;
-alpha = 0.828888888888889;
-show_graph = false;
-cooling_schedule = 180;
-acceptance_prob = 0.9
-[~,best_dist] = simulated_annealing(file,inital_t,k_max,alpha,cooling_technique,cooling_schedule,acceptance_prob,show_graph)
-
-
 
 
 
