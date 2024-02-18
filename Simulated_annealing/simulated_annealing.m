@@ -18,7 +18,7 @@ maintain_heat = 0; %Setting the counter for how long each temperature is held fo
 %%Predicting the temperature
 %%A trial run
 average = zeros(1,1000);
-for i = 1:1000
+for i = 1:k_max
     p = rand(1);
     %%Looking for neighbours, different probabilities results in a
     %%different type of searching technique
@@ -52,11 +52,11 @@ for i = 1:1000
             x_current = x_new;
         end
     end
-    average(i) = e_new - e_current;
+    average(i) = e_new - e_current; %%The change in energy
 end
-delta_e = mean(average); %Averaging the change in energy
+delta_e = mean(average(average ~= 0)); %Averaging the change in energy
 temp = inital_temp;
-j = exp(-delta_e/temp);
+j = exp(-(delta_e/temp));
 while j < acceptance_prob %% Ensures worst moves fall within acceptance %
     j = exp(-delta_e/temp);
     temp = temp + 0.2;
@@ -71,6 +71,7 @@ x_current = randperm(num_cities); %Generate inital solution
 e_current = idx2dist(x_current,inputcities); % Calculate objective function
 x_best = x_current;
 e_best = e_current;
+k = 1;
 %%
 
 while k < k_max 
@@ -112,6 +113,7 @@ while k < k_max
     if show_graph==1   
         plotcities(inputcities(:,x_current)); 
     end
+
     
     if cooling_method==1 && maintain_heat == cooling_schedule %%how long is the heat maintained for
         temp = temp*alpha;

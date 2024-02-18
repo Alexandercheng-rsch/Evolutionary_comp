@@ -53,7 +53,7 @@ end
 
 
 
-if acceleration=="multi" && license('test', 'Distrib_Computing_Toolbox')%%transfer to gpu
+if acceleration=="multi" && license('test', 'Distrib_Computing_Toolbox')%%transfer to workers
     fprintf("GPU acceleration initiated")
 
     termination_flag = false;
