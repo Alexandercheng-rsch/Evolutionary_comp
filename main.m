@@ -27,7 +27,8 @@ for i = 1:n
 end
 
 %%
-[mean_elements,std_elements, clusters] = cluster_calculator(store);
+mode = 0
+[mean_elements,std_elements, clusters] = cluster_calculator(store,mode);
 
 mean_elements = cell2mat(mean_elements);
 std_elements = cell2mat(std_elements);
@@ -85,166 +86,75 @@ calculate_std = std(store);
 %%inputcities,inital_temp,constant_decrement,k_max,num_neighbours,alpha,cooling_schedule,show_graph
 addpath('Simulated_annealing');
 %%
-inital_t = 90;
-constant_decrement = 1.9;
-k_max = 10000;
-num_neighbours = 5
-cooling_technique = 3;
-alpha = 0.95;
-show_graph = true;
-cooling_schedule = 1;
-[x_best,best_dist] = simulated_annealing(file,inital_t,constant_decrement,k_max,num_neighbours,alpha,cooling_technique,cooling_schedule,show_graph)
+inital_t = 10^100;
+k_max = 2000000000;
+cooling_technique = 2;
+alpha = 0.9;
+show_graph = false;
+cooling_schedule = 30;
+store = []
+[~,best_dist] = simulated_annealing(file,inital_t,k_max,num_neighbours,alpha,cooling_technique,cooling_schedule,show_graph)
+%%
+for i = 1:30
+    [~,best_dist] = simulated_annealing(file,inital_t,k_max,num_neighbours,alpha,cooling_technique,cooling_schedule,show_graph)
+    store(end + 1) = best_dist
+end
 
 %%cooling methods: 1 - exponential 2- Linear 3 - Boltzman
 %%
-inital_temp = [90;95;100;110;120;130;150];
-constant_decrement = [1;2;3;4;5;6;7];
-k_max = [100;100;100;100;100;100;100];
-num_neighbours = [1;2;3;4;5;6;7];
-alpha = [1;1;1;1;1;1;1;];
-cooling_technique = [2;2;2;2;2;2;2];
-cooling_schedule = [0;1;2;3;4;5;6];
-params = table(inital_temp,constant_decrement,k_max,num_neighbours,alpha,cooling_technique,cooling_schedule);
-acceleration = "cuda";
-
-n = 30;
-for i = 1:n
-    [b,c] = main_random_local_search("sa",params,@simulated_annealing,file,acceleration);
-    combo_cat_with_dist = cat(2,b,c);
-    if i==2
-        concated_list_1 = cat(1,combo_cat_with_dist,combo_cat_with_dist);
-    elseif i>2
-        concated_list_1 = cat(1,concated_list_1,combo_cat_with_dist);
-    end
+repmat(100,10)
+inital_temp = linspace(100,1000, 10)';
+k_max = repmat(100,1,10)';
+alpha = linspace(0.7, 0.99, 10)';
+cooling_technique = repmat([1 2],1,5)';
+cooling_schedule = linspace(20, 200, 10)';
+acceptance_prob = linspace(0,1,10)';
+%(inputcities,inital_temp,k_max,alpha,cooling_method,cooling_schedule,acceptance_prob,show_graph)
+params = table(inital_temp,k_max,alpha,cooling_technique,cooling_schedule,acceptance_prob);
+acceleration = "multi";
+store = []
+for i = 1:30
+    [hyperparam, dist] = main_random_local_search("sa",params,@simulated_annealing,file,acceleration);
+    combo_cat_with_dist_1 = cat(2,hyperparam,dist);
+    store = [store;combo_cat_with_dist_1];
 end
-
 %%
-
-
-inital_temp = [90;95;100;110;120;130;150];
-constant_decrement = [1;1;1;1;1;1;1];
-k_max = [100;100;100;100;100;100;100];
-num_neighbours = [1;2;3;4;5;6;7];
-alpha = [0.8;0.85;0.9;0.93;0.94;0.95;0.99];
-cooling_technique = [1;1;1;1;1;1;1];
-cooling_schedule = [0;1;2;3;4;5;6];
-params = table(inital_temp,constant_decrement,k_max,num_neighbours,alpha,cooling_technique,cooling_schedule);
-acceleration = "cuda";
-%[hyperparam_2, dist_2] = main_random_local_search("sa",params,@simulated_annealing,file,accel)
-
-n = 30;
-for i = 1:n
-    [b,c] = main_random_local_search("sa",params,@simulated_annealing,file,acceleration);
-    combo_cat_with_dist = cat(2,b,c);
-    if i==2
-        concated_list_2 = cat(1,combo_cat_with_dist,combo_cat_with_dist);
-    elseif i>2
-        concated_list_2 = cat(1,concated_list_2,combo_cat_with_dist);
-    end
-end
-
-
-%%
-inital_temp = [90;95;100;110;120;130;150];
-constant_decrement = [1;1;1;1;1;1;1];
-k_max = [100;100;100;100;100;100;100];
-num_neighbours = [1;2;3;4;5;6;7];
-alpha = [1;1;1;1;1;1;1];
-cooling_technique = [3;3;3;3;3;3;3];
-cooling_schedule = [0;1;2;3;4;5;6];
-params = table(inital_temp,constant_decrement,k_max,num_neighbours,alpha,cooling_technique,cooling_schedule);
-acceleration = "cuda";
-
-
-n = 30;
-for i = 1:n
-    [b,c] = main_random_local_search("sa",params,@simulated_annealing,file,acceleration);
-    combo_cat_with_dist = cat(2,b,c);
-    if i==2
-        concated_list_3 = cat(1,combo_cat_with_dist,combo_cat_with_dist);
-    elseif i>2
-        concated_list_3 = cat(1,concated_list_3,combo_cat_with_dist);
-    end
-end
-
-%%
-cat_1_and_2 = cat(1,concated_list_1,concated_list_2);
-cat_all = cat(1,cat_1_and_2,concated_list_3);
-%%
-
-[mean_elements,std_elements, clusters] = cluster_calculator(cat_all);
+mode = 1;
+[mean_elements,std_elements, clusters] = cluster_calculator(store,mode);
 
 mean_elements = cell2mat(mean_elements);
 std_elements = cell2mat(std_elements);
-[sorted_std,idx_std] = sort(std_elements,'ascend');
-[sorted_mean,idx_mean] = sort(mean_elements,'ascend');
 
 %% We want low distance and low std, which implies robustness and high performing.
-threshold = 1;
+
 candidates = [];
-termination_flag = false
-for i = 1:size(sorted_mean,1)
-    for j = i+1:size(sorted_std,1)-1
-        if idx_std(i)==idx_mean(j)  && termination_flag==false
-            candidates(1 + end) = idx_mean(j);
-        elseif j > 3000
-            termination_flag = true;
-        end
-    end
-    if termination_flag
-        break
+
+for i = 1:length(mean_elements)
+    if mean_elements(i)<35000 && std_elements(i)<1500
+        candidates(end + 1) = i;
     end
 end
+candidates
 %%
-winner = clusters{candidates(1)};
-mean(winner(:,8))
-std(winner(:,8))
+clusters{2887}
 %%
-
-inital_t = 1000000;
-
-constant_decrement = 1;
+inital_t = 1;
 k_max = 10000;
-num_neighbours = 0 
-cooling_method = 1;
-alpha = 0.999;
+cooling_technique = 2;
+alpha = 0.828888888888889;
 show_graph = false;
-cooling_schedule = 10;
-[good,best_dist] = simulated_annealing(file, inital_t, constant_decrement, k_max, num_neighbours, alpha, cooling_method, cooling_schedule, show_graph)
-plotcities(file(:,good))
+cooling_schedule = 180;
+acceptance_prob = 0.8
+store_sa = []
+for i = 1:30
+    [~,best_dist] = simulated_annealing(file,inital_t,k_max,alpha,cooling_technique,cooling_schedule,acceptance_prob,show_graph);
+    store_sa(end + 1) = best_dist
+end
+calculate_mean = mean(store_sa);
+calculate_std = std(store_sa);
+%%
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+[~,best_dist] = simulated_annealing(file,inital_t,k_max,alpha,cooling_technique,cooling_schedule,acceptance_prob,show_graph)
 
 
 

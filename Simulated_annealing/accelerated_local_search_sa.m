@@ -10,7 +10,7 @@ end
 %
 
 %%Listing all possible acceleration methods
-types = ["cpu","cuda"];
+types = ["cpu","multi"];
 if ~any(acceleration==types)
     fprintf("Select an appropriate acceleration method.")
     return
@@ -24,7 +24,8 @@ if acceleration=="cpu" %%transfer to cpu
     store = [];
     idx = 0;
     
-    combination = table2array(combinations(table2array(parameters(:,1)),table2array(parameters(:,2)),table2array(parameters(:,3)),table2array(parameters(:,4)),table2array(parameters(:,5)),table2array(parameters(:,6)),table2array(parameters(:,7))));
+    combination = table2array(combinations(table2array(parameters(:,1)),table2array(parameters(:,2)), ...
+        table2array(parameters(:,3)),table2array(parameters(:,4)),table2array(parameters(:,5)),table2array(parameters(:,6))));
     [combination, ~, ~] = unique(combination,"rows","stable");
     stop = size(combination,1);
     
@@ -32,7 +33,7 @@ if acceleration=="cpu" %%transfer to cpu
     while termination_flag==false
         idx = idx + 1;
         show = false;
-        [~,best_distance] = sa(file,combination(idx,1),combination(idx,2),combination(idx,3),combination(idx,4),combination(idx,5),combination(idx,6),combination(idx,7),show);
+        [~,best_distance] = sa(file,combination(idx,1),combination(idx,2),combination(idx,3),combination(idx,4),combination(idx,5),combination(idx,6),show);
         
         store(end + 1) = best_distance;
         if idx==stop || idx==iteration
@@ -52,14 +53,14 @@ end
 
 
 
-if acceleration=="cuda" && license('test', 'Distrib_Computing_Toolbox')%%transfer to gpu
+if acceleration=="multi" && license('test', 'Distrib_Computing_Toolbox')%%transfer to gpu
     fprintf("GPU acceleration initiated")
 
     termination_flag = false;
     
     %%turning table into array
     combination = table2array(combinations(table2array(parameters(:,1)),table2array(parameters(:,2)),table2array(parameters(:,3)), ...
-        table2array(parameters(:,4)),table2array(parameters(:,5)),table2array(parameters(:,6)),table2array(parameters(:,7))));
+        table2array(parameters(:,4)),table2array(parameters(:,5)),table2array(parameters(:,6))));
   
     [combination, ~, ~] = unique(combination,"rows","stable");
   
@@ -90,10 +91,9 @@ if acceleration=="cuda" && license('test', 'Distrib_Computing_Toolbox')%%transfe
     show = false;
 
     parfor idx = 1:stop
-        [~, best_distance] = sa(file,combination(idx,1),combination(idx,2),combination(idx,3),combination(idx,4),combination(idx,5),combination(idx,6),combination(idx,7),show)
+        [~, best_distance] = sa(file,combination(idx,1),combination(idx,2),combination(idx,3),combination(idx,4),combination(idx,5),combination(idx,6),show)
         all_dist(idx) = best_distance;
         hyperparam(idx,:) = combination(idx,:);
-        disp(['Iteration: ', num2str(i)]);
         
     end
     %
@@ -108,7 +108,7 @@ if acceleration=="cuda" && license('test', 'Distrib_Computing_Toolbox')%%transfe
 end
 
 %error code if Toolkit is unavailable
-if acceleration=="cuda" && ~license('test', 'Distrib_Computing_Toolbox')
+if acceleration=="multi" && ~license('test', 'Distrib_Computing_Toolbox')
     error('Distribution Computing Toolbox not available.')
 end
 

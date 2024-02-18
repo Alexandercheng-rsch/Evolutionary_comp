@@ -62,16 +62,14 @@ while j < acceptance_prob %% Ensures worst moves fall within acceptance %
     temp = temp + 0.2;
 
 end
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%Main part of the SA
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%algorithm%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%
+
 
 %%Reinitiating the parameters
 x_current = randperm(num_cities); %Generate inital solution
 e_current = idx2dist(x_current,inputcities); % Calculate objective function
 x_best = x_current;
 e_best = e_current;
-%%
 
 while k < k_max 
 
@@ -79,7 +77,7 @@ while k < k_max
     %%Looking for neighbours, different probabilities results in a
     %%different type of searching technique
     if p<= 0.1
-        x_new = twoopt(inversion_mutation(RSM(twoopt(x_current)))); %%Big perturbation 
+        x_new = twoopt(inversion_mutation(RSM(twoopt(x_current))));
         e_new = idx2dist(x_new,inputcities);
     elseif p > 0.1 && p <= 0.3
         x_new = twoopt(x_current);
