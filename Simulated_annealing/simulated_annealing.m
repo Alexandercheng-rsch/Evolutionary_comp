@@ -1,7 +1,10 @@
-function [x_best, e_best] = simulated_annealing(inputcities, temp_max, alpha, cooling_method, cooling_schedule, show_graph)
+function [x_best, e_best] = simulated_annealing(inputcities, temp_max, alpha, cooling_method, cooling_schedule,iterations,show_graph)
 num_cities = size(inputcities,2);
-if nargin<5 || isempty(show_graph)
+if nargin<7 || isempty(show_graph)
     show_graph = false;
+end
+if nargin<6 || isempty(iterations)
+    iterations = 0
 end
 
 x_current = randperm(num_cities); %Generate inital solution
@@ -11,7 +14,15 @@ e_best = e_current;
 maintain_temperature = 1;
 temp_min = 1;
 temp = temp_max;
-iterations = 1;
+
+
+if iterations==0
+    use_iterations = false;
+else
+    use_iterations = true;
+end
+
+k = 1;
 %%
 
 while temp > temp_min
@@ -59,6 +70,12 @@ while temp > temp_min
 
     if cooling_schedule>0
         maintain_temperature = maintain_temperature + 1;
+    end
+
+    k = k + 1;
+
+    if (use_iterations) & (k == iterations)
+        break
     end
 
 

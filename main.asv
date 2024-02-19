@@ -88,27 +88,22 @@ addpath('Simulated_annealing');
 
 %%
 repmat(100,10)
-temp_max = linspace(100,10000, 2 0)';
-alpha = linspace(0.8, 0.99, 20)';adasdsadsad
-cooling_technique = repmat([1 2],1,10)';
-cooling_schedule = round(linspace(100, 700, 20))';
+temp_max = linspace(100,10000, 6)';
+alpha = linspace(0.8, 0.99, 6)';
+cooling_technique = [1;2;1;1;1;1];
+cooling_schedule = round(linspace(100, 700, 6))';
 %temp_max, alpha, cooling_method, cooling_schedule,max_iterations, show_graph)
 params = table(temp_max ,alpha, cooling_technique, cooling_schedule);
 acceleration = "multi";
 [hyperparam, dist, std] = main_random_local_search("sa",params,@simulated_annealing,file,acceleration);
 %%
-mode = 1;
-[mean_elements,std_elements, clusters] = cluster_calculator(store,mode);
-
-mean_elements = cell2mat(mean_elements);
-std_elements = cell2mat(std_elements);
-
+concat = [hyperparam,dist,std]
 %% We want low distance and low std, which implies robustness and high performing.
 
 candidates = [];
 
-for i = 1:length(mean_elements)
-    if mean_elements(i)<30000 & std_elements(i)<1000
+for i = 1:size(concat,1)
+    if concat(i,5)<10000 & concat(i,6)<2000
         candidates(end + 1) = i;
     end
 end

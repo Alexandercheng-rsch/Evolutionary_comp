@@ -1,6 +1,6 @@
 
 
-function [hyperparam, best_dist] = accelerated_local_search_ga(parameters,tsp,file,acceleration,iteration)
+function [hyperparam, distances, standard_devs] = accelerated_local_search_ga(parameters,tsp,file,acceleration,iteration)
 
 %%If it's empty, these are the default values
 if nargin <5 || isempty(iteration)
@@ -12,7 +12,7 @@ end
 %
 
 %%Listing all possible acceleration methods
-types = ["cpu","cuda"];
+types = ["cpu","multi"];
 if ~any(acceleration==types)
     fprintf("Select an appropriate acceleration method.")
     return
@@ -21,20 +21,29 @@ end
 
 %%CPU acceleration method
 if acceleration=="cpu" %%transfer to cpu
+
+    idx = 0; 
     termination_flag = false; 
     combination = table2array(combinations(table2array(parameters(:,1)),table2array(parameters(:,2)),table2array(parameters(:,3)), ...
         table2array(parameters(:,4)),table2array(parameters(:,5)),table2array(parameters(:,6)),table2array(parameters(:,7)),table2array(parameters(:,8)))); %turning table back into array
     [combination, ~, ~] = unique(combination,"rows","stable"); %Getting unique combinations 
-    store = []; %store all lowest distances
-    stop = size(combination,1);
-    idx = 0;%indexing
     all_dist = zeros(1, stop);
+    all_std = zeros(1, stop);
+    hyperparam = zeros(stop, width(parameters));
+    
 
     stop = size(combination,1); %calculating amount of iterations
     while termination_flag==false
         idx = idx + 1;
-        [~,best_distance] = tsp(file,combination(idx,1),combination(idx,2),combination(idx,3), ...
-            combination(idx,4),combination(idx,5),combination(idx,6),combination(idx,7),combination(idx,8)); %loading into the algorithm
+        show = false;
+        storage = zeros(1, 5);
+        for i = 1:10
+            [~,best_distance] = tsp(file,combination(idx,1),combination(idx,2),combination(idx,3), ...
+                combination(idx,4),combination(idx,5),combination(idx,6),combination(idx,7),combination(idx,8)); %loading into the algorithm
+        end
+        all_dist(idx) = mean(storage);
+        hyperparam(idx,:) = combination(idx,:);
+        all_std(idx,:) = std(storage);
         %
         %storing best tours and distances
         store(end + 1) = best_distance(:,1);
@@ -47,15 +56,17 @@ if acceleration=="cpu" %%transfer to cpu
     [~,sorted_idx] = sort(store,"ascend"); %% sorts best to worst
 
     %output of the best performing hyperparameters and routes with distance
-    hyperparam = combination(sorted_idx(:,1),:);
-    all_dist = store;
+    hyperparam = combination(sorted_idx,:);
+    distances = all_dist(sorted_idx);
+    distances = distances';
+    standard_devs = all_std(sorted_idx)'
     %
 end
 
 
-%%Accelerated with CUDA
-if acceleration=="cuda" && license('test', 'Distrib_Computing_Toolbox') %%transfer to gpu
-    fprintf("GPU acceleration initiated")
+
+if acceleration=="multi" && license('test', 'Distrib_Computing_Toolbox') %%transfer to gpu
+    fprintf("Using parallel computing")
     termination_flag = false;
     
     %%turning table into array
@@ -88,10 +99,16 @@ if acceleration=="cuda" && license('test', 'Distrib_Computing_Toolbox') %%transf
     
     %performing parfor loop
     parfor idx = 1:stop
-        [~, best_distance] = tsp(file,combination(idx,1),combination(idx,2),combination(idx,3),combination(idx,4), ...
+        storage = zeros(1, 5);
+        for i = 1:10
+            [~, best_distance] = tsp(file,combination(idx,1),combination(idx,2),combination(idx,3),combination(idx,4), ...
             combination(idx,5),combination(idx,6),combination(idx,7),combination(idx,8));
-        all_dist(idx) = gather(best_distance);
-        hyperparam(idx,:) = gather(combination(idx,:));
+            storage(i) = best_distance;
+        end
+        all_dist(idx) = mean(storage);
+        hyperparam(idx,:) = combination(idx,:);
+        all_std(idx,:) = std(storage);  
+        disp(idx)        
     end
     %
 
@@ -99,8 +116,9 @@ if acceleration=="cuda" && license('test', 'Distrib_Computing_Toolbox') %%transf
     [~,sorted_idx] = sort(all_dist,"ascend");
     %storing best results based on hyperparameters
     hyperparam = combination(sorted_idx,:);
-    best_dist = all_dist(sorted_idx);
-    best_dist = best_dist';
+    distances = all_dist(sorted_idx);
+    distances = distances';
+    standard_devs = all_std(sorted_idx)'
     %
 
 end

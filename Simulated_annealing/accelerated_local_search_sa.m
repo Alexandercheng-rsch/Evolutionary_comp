@@ -60,7 +60,7 @@ end
 
 
 if acceleration=="multi" && license('test', 'Distrib_Computing_Toolbox')%%transfer to workers
-    fprintf("GPU acceleration initiated")
+    fprintf("Using parallel computing")
 
     termination_flag = false;
     
