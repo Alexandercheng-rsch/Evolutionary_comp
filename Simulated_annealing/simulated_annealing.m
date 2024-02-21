@@ -4,7 +4,7 @@ if nargin<7 || isempty(show_graph)
     show_graph = false;
 end
 if nargin<6 || isempty(iterations)
-    iterations = 0
+    iterations = 0;
 end
 
 x_current = randperm(num_cities); %Generate inital solution
@@ -31,14 +31,10 @@ while temp > temp_min
     p = rand(1);
     %%Looking for neighbours, different probabilities results in a
     %%different type of searching technique
-    if p < 0.1
-        x_new = twoopt(inversion_mutation(RSM(x_current)));
-        e_new = idx2dist(x_new,inputcities);
-   
-    elseif (p < 0.1) & (p<0.33)
+    if (p < 0.1)
         x_new = RSM(x_current);
         e_new = idx2dist(x_new,inputcities);        
-    elseif (p > 0.33) & (p<0.66)
+    elseif (p > 0.33) && (p<0.66)
         x_new = twoopt(x_current);
         e_new = idx2dist(x_new,inputcities);
     else

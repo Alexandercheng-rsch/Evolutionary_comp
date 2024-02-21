@@ -22,6 +22,7 @@ if acceleration=="cpu" %%transfer to cpu
   
     termination_flag = false;
     idx = 0;
+
     
     combination = table2array(combinations(table2array(parameters(:,1)),table2array(parameters(:,2)), ...
         table2array(parameters(:,3)),table2array(parameters(:,4))));
@@ -31,11 +32,11 @@ if acceleration=="cpu" %%transfer to cpu
     all_std = zeros(1, stop);
     hyperparam = zeros(stop, width(parameters));
     while termination_flag==false
-        idx = idx + 1;
-        show = false;
-        storage = zeros(1, 5);
+        idx = idx + 1
+        show = true;
+        storage = zeros(1, 10);
         for i = 1:10
-            [~, best_distance] = sa(file,combination(idx,1),combination(idx,2),combination(idx,3),combination(idx,4),show)
+            [~, best_distance] = sa(file,combination(idx,1),combination(idx,2),combination(idx,3),combination(idx,4),0,0);
             storage(i) = best_distance;
         end
         all_dist(idx) = mean(storage);
@@ -98,9 +99,9 @@ if acceleration=="multi" && license('test', 'Distrib_Computing_Toolbox')%%transf
     show = false;
 
     parfor idx = 1:stop
-        storage = zeros(1, 5);
+        storage = zeros(1, 10);
         for i = 1:10
-            [~, best_distance] = sa(file,combination(idx,1),combination(idx,2),combination(idx,3),combination(idx,4),show)
+            [~, best_distance] = sa(file,combination(idx,1),combination(idx,2),combination(idx,3),combination(idx,4),10000,0)
             storage(i) = best_distance;
         end
 
@@ -115,7 +116,7 @@ if acceleration=="multi" && license('test', 'Distrib_Computing_Toolbox')%%transf
     hyperparam = combination(sorted_idx,:);
     best_dist = all_dist(sorted_idx);
     best_dist = best_dist';
-    best_std = all_std(sorted_idx)'
+    best_std = all_std(sorted_idx)';
     %
     
 

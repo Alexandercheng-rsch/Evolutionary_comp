@@ -36,13 +36,15 @@ hyperparams(1,:)
 %%
 crossover_prob = 0.95;
 pop_size = 12;
-iterations = 10000/pop_size;
+iterations = 1000000/pop_size;
 mutation_prob = 0.05;
 selection_method = 1;
 k = 8;
 mutation_type = 1;
 elitism_factor = 0.14 ;
 plots = false;
+GA_perm(cities,crossover_prob,pop_size,iterations,mutation_prob,selection_method,k,mutation_type,elitism_factor,plots)
+%%
 store = [];
 for i = 1:30
     [~,b] = GA_perm(cities,crossover_prob,pop_size,iterations,mutation_prob,selection_method,k,mutation_type,elitism_factor,plots);

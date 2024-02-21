@@ -8,6 +8,8 @@ function [best_tour, best_distance] = GA_perm(inputcities, crossover_prob, max_p
     %%Generating a random population
     pop = spawn_pop(max_pop,num_cities);
     numElites = max(1,round(eliteFraction * max_pop));
+    %%Evaluating the fitness of the population
+    [evaluated_pop_fitness,~] = evaluate_fitness(pop,inputcities);
 
 
     termination = false;
@@ -107,10 +109,11 @@ function [best_tour, best_distance] = GA_perm(inputcities, crossover_prob, max_p
 
 
  
-
+        %%Revaluate the fitness of the population
 
         best_tour = pop(1,:);
-        best_distance = evaluate_fitness(pop,inputcities);
+        [evaluated_fit,~] = evaluate_fitness(pop,inputcities);
+        
         
         if plot_graph == 1
             plotcities(inputcities(:,pop(1,:))); % plotting the best performer
@@ -130,6 +133,7 @@ function [best_tour, best_distance] = GA_perm(inputcities, crossover_prob, max_p
 
 
     end
+    best_distance = evaluated_fit(1);
 
 end
 
@@ -189,10 +193,10 @@ end
 end
 
 
-function [best_distance, best_route] = evaluate_fitness(population,inputcities)
+function [evaluated_dist, best_route, sorted_idx] = evaluate_fitness(population,inputcities)
 population_distances = idx2dist(population,inputcities);
 [sorted_dist, sorted_idx] = sort(population_distances,"ascend");
-best_distance = sorted_dist(1);
+evaluated_dist = sorted_dist;
 best_route = population(sorted_idx(1),:);
 end
     
