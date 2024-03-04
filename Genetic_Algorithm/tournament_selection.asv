@@ -1,35 +1,29 @@
-function winners = tournament_selection(pop, k, max_pop, inputcities)
-n = size(pop,2)
-winners = zeros(max_pop,n)
-best = randperm(size(pop,2),1)
-best = pop(idx(2),:)
-for j = 1:max_pop
-    for i = 2:k
-        idx = randperm(n,2)
-        participant_1 = pop(best,:)
-        participant_2 = pop(idx(2),:)
-        if idx2dist(best,:) > idx2dist(participant_2,:)
-            best = pop(participant_2,:)
+function winners = tournament_selection(pop, k, max_pop, evaluated_distances)
+    n = size(pop,1);  % Number of individuals in the population
+    winners = zeros(max_pop, size(pop,2));  % Preallocate winners matrix. Preallocation for efficiency
+
+    for j = 1:max_pop
+        %Randomly select some individual to be our winner for the
+        %tournament. Not neccessarily the best.
+        bestIdx = randperm(n, 1); %%Randomly selecting an index from the stack of chromosomes
+        best = pop(bestIdx, :); %Defining the random 'winner'
+        bestDist = evaluated_distance(:,bestIdx);  % Calculate its distance(Fitness)
+
+        for i = 2:k %Start at 2 because we don't want to put the individual up against itself
+            % Randomly select another participant for the tournament
+            participantIdx = randperm(n, 1);
+            participant = pop(participantIdx, :);
+
+            % Calculate the distance for the participant and compare with
+            % the current best individual
+            participantDist = idx2dist(participant, inputcities);
+            if participantDist < bestDist %%If the winner loses it gets replaced
+                best = participant;
+                bestDist = participantDist;  % Update the best distance
+            end
         end
+
+        % Assign the tournament winner to the winners matrix
+        winners(j,:) = best;
     end
-    winners(j,:) = pop
-end
-
-
-
-
-
-
-
-
-
-
-
-
-
-function [dist] = idx2dist(index,inputcities)
-dist = [];
-for i = 1:size(index,1)
-    dist(end + 1) = distance(inputcities(:,index(i,:)));
-end
 end

@@ -12,8 +12,8 @@ function [best_tour, best_distance] = GA_perm(inputcities, crossover_prob, max_p
     %%
     [eval_dist,eval_pop,~] = evaluate_fitness(pop,inputcities);
     %%
-    distance_log = zeros(1,max_pop*max_iter);
-    distance_log(1,1:max_pop) = eval_dist;
+    distance_log = zeros(1,max_pop*max_iter)
+    distance_log(1,1")
 
     termination = false;
     t = 1;
@@ -50,7 +50,6 @@ function [best_tour, best_distance] = GA_perm(inputcities, crossover_prob, max_p
 
       
         [eval_dist,eval_pop,sorted_idx] = evaluate_fitness(offspring,inputcities);
-        distance_log(1,max_pop*t+1:max_pop*t+max_pop) = eval_dist;
 
        
 
@@ -64,8 +63,7 @@ function [best_tour, best_distance] = GA_perm(inputcities, crossover_prob, max_p
         random = randsample(numElites+1:max_pop,max_pop - numElites);
 
         eval_pop = [elites;eval_route(random,:)];
-        eval_dist = [eval_dist(:,1:numElites),eval_dist(:,random)];
-
+        eval_dist = [eval_dist(:,1:numElites),eval_dist(:,random)]
      
    
 
@@ -84,13 +82,10 @@ function [best_tour, best_distance] = GA_perm(inputcities, crossover_prob, max_p
         if (t>max_iter)
             termination=true;
         end
-        
-
 
     end
-    [sorted_log, ~] = sort(distance_log,'ascend');
 
-    best_distance = sorted_log(:,1);
+    best_distance = eval_dist(:,1);
     best_tour = eval_pop(1,:);
 
 end

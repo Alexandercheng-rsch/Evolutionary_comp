@@ -24,7 +24,7 @@ if acceleration=="cpu" %%transfer to cpu
     idx = 0;
 
     
-    combination = table2array(combinations(table2array(parameters(:,1)),table2array(parameters(:,2)),table2array(parameters(:,3))));
+    combination = table2array(combinations(table2array(parameters(:,1)),table2array(parameters(:,2))));
     [combination, ~, ~] = unique(combination,"rows","stable");
     stop = size(combination,1)
     all_dist = zeros(1, stop);
@@ -32,7 +32,7 @@ if acceleration=="cpu" %%transfer to cpu
     while termination_flag==false
         idx = idx + 1
         show = true;
-        [~, best_distance] = sa(file,combination(idx,1),combination(idx,2),combination(idx,3),10000,0);
+        [~, best_distance] = sa(file,combination(idx,1),combination(idx,2),0,0);
         all_dist(idx) = best_distance;
         hyperparam(idx,:) = combination(idx,:);
 
@@ -59,7 +59,7 @@ if acceleration=="multi" && license('test', 'Distrib_Computing_Toolbox')%%transf
     termination_flag = false;
     
     %%turning table into array
-    combination = table2array(combinations(table2array(parameters(:,1)),table2array(parameters(:,2)),table2array(parameters(:,3))));
+    combination = table2array(combinations(table2array(parameters(:,1)),table2array(parameters(:,2))));
   
     [combination, ~, ~] = unique(combination,"rows","stable");
   
@@ -91,7 +91,7 @@ if acceleration=="multi" && license('test', 'Distrib_Computing_Toolbox')%%transf
     show = false;
 
     parfor idx = 1:stop
-        [~, best_distance] = sa(file,combination(idx,1),combination(idx,2),combination(idx,3),0,0)
+        [~, best_distance] = sa(file,combination(idx,1),combination(idx,2),10000,0)
         all_dist(idx) = best_distance;
         hyperparam(idx,:) = combination(idx,:);
         disp(idx)

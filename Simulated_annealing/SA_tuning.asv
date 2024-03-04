@@ -33,9 +33,9 @@ calculate_mean = mean(store_distance);
 calculate_std = std(store_distance);
 
 %%
-t_max = 1000;
+t_max = 600;
 alpha = 0.999;
-iterations = 10000;
+iterations = 0;
 cooling_schedule = 500;
 show_graph = false
 [~,best_dist] = simulated_annealing(cities,t_max,alpha,cooling_schedule,iterations,show_graph)
